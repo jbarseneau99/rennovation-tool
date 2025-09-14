@@ -1,45 +1,15 @@
-// Load data from GitHub
-        function loadData() {
-            document.getElementById('status').textContent = 'Loading from GitHub...';
-            
-            // Try multiple methods to ensure we get the data
-            const rawUrl = 'https://raw.githubusercontent.com/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/main/' + GITHUB_PATH;
-            const apiUrl = 'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_PATH;
-            
-            // First try raw URL with cache bypass
-            fetch(rawUrl + '?t=' + Date.now())
-                .then(response => {
-                    if (!response.ok) {
-                        // If raw fails, try API
-                        return fetch(apiUrl)
-                            .then(apiResponse => apiResponse.json())
-                            .then(apiData => {
-                                // Decode base64 content from API
-                                const content = atob(apiData.content);
-                                return JSON.parse(content);
-                            });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Apply loaded data to form
-                    if (data.tasks && data.tasks.length > 0) {
-                        // First task
-                        if (data.tasks[0]) {
-                            document.getElementById('demo-days').value = data.tasks[0].duration || 2;
-                            document.getElementById('demo-workers').value = data.tasks[0].workers || 2;
-                            document.getElementById('demo-materials').value = data.tasks[0].materials || 100;
-                            document.getElementById('demo-status').value = data.tasks[0].status || '<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kitchen Renovation Project Plan</title>
+    <title>Kitchen Renovation Tracker - Local Storage</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background: #f0f0f0;
             padding: 20px;
+            margin: 0;
         }
         .container {
             max-width: 1200px;
@@ -47,10 +17,20 @@
             background: white;
             padding: 20px;
             border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
         h1 {
             color: #333;
             text-align: center;
+            margin-bottom: 10px;
+        }
+        .info {
+            text-align: center;
+            color: #666;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #e8f5e9;
+            border-radius: 5px;
         }
         .controls {
             text-align: center;
@@ -63,21 +43,19 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 16px;
+            color: white;
         }
         .save-btn {
             background: #28a745;
-            color: white;
         }
-        .load-btn {
+        .export-btn {
             background: #007bff;
-            color: white;
         }
-        #status {
-            text-align: center;
-            margin: 20px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
+        .import-btn {
+            background: #6c757d;
+        }
+        .reset-btn {
+            background: #dc3545;
         }
         table {
             width: 100%;
@@ -86,30 +64,58 @@
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: left;
         }
         th {
             background: #667eea;
             color: white;
         }
-        input {
+        input[type="number"], input[type="text"], select {
             width: 100%;
-            border: 1px solid #ddd;
             padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
         }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+        }
+        .status-pending { background: #fff3cd; }
+        .status-progress { background: #cce5ff; }
+        .status-completed { background: #d4edda; }
+        #status {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            display: none;
+        }
+        .success { background: #d4edda; color: #155724; display: block; }
+        .error { background: #f8d7da; color: #721c24; display: block; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🏠 Kitchen Renovation Tracker</h1>
-        
-        <div class="controls">
-            <button class="save-btn" onclick="saveData()">💾 Save to GitHub</button>
-            <button onclick="downloadBackup()">📥 Download Backup</button>
+        <div class="info">
+            ✅ All data saves automatically in your browser<br>
+            📱 Works offline - no internet needed<br>
+            💾 Export/Import to share between devices
         </div>
         
-        <div id="status">Ready to sync with GitHub</div>
+        <div id="status"></div>
+        
+        <div class="controls">
+            <button class="save-btn" onclick="saveData()">💾 Save Changes</button>
+            <button class="export-btn" onclick="exportData()">📥 Export to File</button>
+            <button class="import-btn" onclick="importData()">📤 Import from File</button>
+            <button class="reset-btn" onclick="resetData()">🔄 Reset All</button>
+        </div>
         
         <table>
             <thead>
@@ -118,245 +124,227 @@
                     <th>Task</th>
                     <th>Days</th>
                     <th>Workers</th>
+                    <th>Hours</th>
+                    <th>Labor ($55/hr)</th>
                     <th>Materials ($)</th>
+                    <th>Total Cost</th>
                     <th>Status</th>
+                    <th>Contractor</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>1. Demolition</td>
-                    <td>Remove cabinets</td>
-                    <td><input type="number" id="demo-days" value="2"></td>
-                    <td><input type="number" id="demo-workers" value="2"></td>
-                    <td><input type="number" id="demo-materials" value="100"></td>
-                    <td>
-                        <select id="demo-status">
-                            <option>Pending</option>
-                            <option>In Progress</option>
-                            <option>Completed</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2. Framing</td>
-                    <td>Wall modifications</td>
-                    <td><input type="number" id="frame-days" value="3"></td>
-                    <td><input type="number" id="frame-workers" value="2"></td>
-                    <td><input type="number" id="frame-materials" value="800"></td>
-                    <td>
-                        <select id="frame-status">
-                            <option>Pending</option>
-                            <option>In Progress</option>
-                            <option>Completed</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>3. Electrical</td>
-                    <td>Rough-in wiring</td>
-                    <td><input type="number" id="elec-days" value="2"></td>
-                    <td><input type="number" id="elec-workers" value="2"></td>
-                    <td><input type="number" id="elec-materials" value="600"></td>
-                    <td>
-                        <select id="elec-status">
-                            <option>Pending</option>
-                            <option>In Progress</option>
-                            <option>Completed</option>
-                        </select>
-                    </td>
-                </tr>
+            <tbody id="taskTable">
+                <!-- Tasks will be loaded here -->
             </tbody>
+            <tfoot>
+                <tr style="font-weight: bold; background: #f0f0f0;">
+                    <td colspan="2">TOTALS</td>
+                    <td id="totalDays">0</td>
+                    <td>-</td>
+                    <td id="totalHours">0</td>
+                    <td id="totalLabor">$0</td>
+                    <td id="totalMaterials">$0</td>
+                    <td id="totalCost">$0</td>
+                    <td colspan="2">-</td>
+                </tr>
+            </tfoot>
         </table>
         
         <div>
             <h3>Project Notes</h3>
-            <textarea id="notes" style="width: 100%; height: 100px;">Enter your project notes here...</textarea>
+            <textarea id="notes" placeholder="Enter your project notes, reminders, permit numbers, etc."></textarea>
         </div>
     </div>
 
     <script>
-        // GitHub configuration - MAKE SURE THESE ARE CORRECT
-        const GITHUB_OWNER = 'jbarseneau99';
-        const GITHUB_REPO = 'renovation-tool';
-        const GITHUB_PATH = 'data.json';
-        
-        // Load data from GitHub - try multiple methods
+        // Default data structure
+        const defaultTasks = [
+            // Demolition
+            { phase: "1. Demolition", task: "Remove cabinets & countertops", days: 2, workers: 2, materials: 100, status: "Pending", contractor: "" },
+            { phase: "1. Demolition", task: "Remove flooring", days: 1, workers: 2, materials: 50, status: "Pending", contractor: "" },
+            { phase: "1. Demolition", task: "Debris removal", days: 1, workers: 1, materials: 200, status: "Pending", contractor: "" },
+            // Framing
+            { phase: "2. Framing", task: "Wall modifications", days: 3, workers: 2, materials: 800, status: "Pending", contractor: "" },
+            { phase: "2. Framing", task: "Window/door framing", days: 2, workers: 2, materials: 500, status: "Pending", contractor: "" },
+            { phase: "2. Framing", task: "Structural reinforcement", days: 2, workers: 2, materials: 400, status: "Pending", contractor: "" },
+            // Electrical
+            { phase: "3. Electrical", task: "Rough-in wiring", days: 2, workers: 2, materials: 600, status: "Pending", contractor: "" },
+            { phase: "3. Electrical", task: "Install outlets & switches", days: 1, workers: 2, materials: 300, status: "Pending", contractor: "" },
+            { phase: "3. Electrical", task: "Lighting installation", days: 2, workers: 1, materials: 800, status: "Pending", contractor: "" },
+            { phase: "3. Electrical", task: "Electrical inspection", days: 1, workers: 1, materials: 150, status: "Pending", contractor: "" },
+            // Plumbing
+            { phase: "4. Plumbing", task: "Rough-in plumbing", days: 2, workers: 2, materials: 500, status: "Pending", contractor: "" },
+            { phase: "4. Plumbing", task: "Install sink & dishwasher lines", days: 1, workers: 2, materials: 300, status: "Pending", contractor: "" },
+            { phase: "4. Plumbing", task: "Gas line for stove", days: 1, workers: 1, materials: 200, status: "Pending", contractor: "" },
+            { phase: "4. Plumbing", task: "Plumbing inspection", days: 1, workers: 1, materials: 150, status: "Pending", contractor: "" },
+            // Flooring
+            { phase: "5. Flooring", task: "Subfloor preparation", days: 1, workers: 2, materials: 300, status: "Pending", contractor: "" },
+            { phase: "5. Flooring", task: "Install flooring", days: 3, workers: 3, materials: 2500, status: "Pending", contractor: "" },
+            { phase: "5. Flooring", task: "Baseboards & trim", days: 2, workers: 2, materials: 400, status: "Pending", contractor: "" },
+            // Finishing
+            { phase: "6. Finishing", task: "Drywall installation", days: 3, workers: 2, materials: 600, status: "Pending", contractor: "" },
+            { phase: "6. Finishing", task: "Taping & mudding", days: 3, workers: 2, materials: 200, status: "Pending", contractor: "" },
+            { phase: "6. Finishing", task: "Painting walls & ceiling", days: 3, workers: 2, materials: 400, status: "Pending", contractor: "" },
+            { phase: "6. Finishing", task: "Install backsplash", days: 2, workers: 2, materials: 600, status: "Pending", contractor: "" },
+            // Cabinets
+            { phase: "7. Cabinets", task: "Cabinet delivery & inspection", days: 1, workers: 2, materials: 6000, status: "Pending", contractor: "" },
+            { phase: "7. Cabinets", task: "Install upper cabinets", days: 2, workers: 2, materials: 100, status: "Pending", contractor: "" },
+            { phase: "7. Cabinets", task: "Install lower cabinets", days: 2, workers: 2, materials: 100, status: "Pending", contractor: "" },
+            { phase: "7. Cabinets", task: "Countertop installation", days: 2, workers: 2, materials: 3000, status: "Pending", contractor: "" },
+            { phase: "7. Cabinets", task: "Hardware & final adjustments", days: 1, workers: 1, materials: 300, status: "Pending", contractor: "" }
+        ];
+
+        let tasks = [];
+        const HOURLY_RATE = 55;
+
+        // Load data from localStorage
         function loadData() {
-            document.getElementById('status').textContent = 'Loading from GitHub...';
-            
-            // Method 1: Try jsdelivr CDN first
-            const cdnUrl = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@main/${GITHUB_PATH}`;
-            
-            fetch(cdnUrl)
-                .then(response => {
-                    if (!response.ok) throw new Error('CDN failed');
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Loaded from CDN:', data);
-                    applyData(data);
-                })
-                .catch(error => {
-                    console.log('CDN failed, trying raw GitHub...');
-                    // Method 2: Try raw.githubusercontent.com
-                    return fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${GITHUB_PATH}`)
-                        .then(response => {
-                            if (!response.ok) throw new Error('Raw GitHub failed');
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Loaded from raw GitHub:', data);
-                            applyData(data);
-                        });
-                })
-                .catch(error => {
-                    console.error('All methods failed:', error);
-                    // Just use defaults
-                    document.getElementById('status').textContent = 'Could not load saved data - using defaults';
-                    document.getElementById('status').style.background = '#fff3cd';
-                });
-        }
-        
-        // Apply data to form
-        function applyData(data) {
-            if (data.tasks && data.tasks.length > 0) {
-                // First task
-                if (data.tasks[0]) {
-                    document.getElementById('demo-days').value = data.tasks[0].duration || 2;
-                    document.getElementById('demo-workers').value = data.tasks[0].workers || 2;
-                    document.getElementById('demo-materials').value = data.tasks[0].materials || 100;
-                    document.getElementById('demo-status').value = data.tasks[0].status || 'Pending';
-                }
-                // Second task
-                if (data.tasks[1]) {
-                    document.getElementById('frame-days').value = data.tasks[1].duration || 3;
-                    document.getElementById('frame-workers').value = data.tasks[1].workers || 2;
-                    document.getElementById('frame-materials').value = data.tasks[1].materials || 800;
-                    document.getElementById('frame-status').value = data.tasks[1].status || 'Pending';
-                }
-                // Third task
-                if (data.tasks[2]) {
-                    document.getElementById('elec-days').value = data.tasks[2].duration || 2;
-                    document.getElementById('elec-workers').value = data.tasks[2].workers || 2;
-                    document.getElementById('elec-materials').value = data.tasks[2].materials || 600;
-                    document.getElementById('elec-status').value = data.tasks[2].status || 'Pending';
-                }
+            const saved = localStorage.getItem('renovationData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                tasks = data.tasks || defaultTasks;
+                document.getElementById('notes').value = data.notes || '';
+            } else {
+                tasks = defaultTasks;
             }
-            
-            if (data.projectNotes) {
-                document.getElementById('notes').value = data.projectNotes;
-            }
-            
-            const lastUpdate = data.lastUpdated ? new Date(data.lastUpdated).toLocaleString() : 'Never';
-            document.getElementById('status').textContent = 'Loaded successfully - Last updated: ' + lastUpdate;
-            document.getElementById('status').style.background = '#d4edda';
+            renderTable();
         }
-        
-        // Save data to GitHub
+
+        // Save data to localStorage
         function saveData() {
-            // Get token
-            let token = localStorage.getItem('githubToken');
-            if (!token) {
-                token = prompt('Enter your GitHub Personal Access Token:\n\n1. Go to GitHub Settings\n2. Developer settings\n3. Personal access tokens\n4. Generate new token (classic)\n5. Check "repo" scope\n6. Copy token here');
-                if (!token) return;
-                localStorage.setItem('githubToken', token);
-            }
-            
-            // Collect data
             const data = {
-                lastUpdated: new Date().toISOString(),
-                tasks: [
-                    {
-                        taskName: 'Remove cabinets',
-                        duration: document.getElementById('demo-days').value,
-                        workers: document.getElementById('demo-workers').value,
-                        materials: document.getElementById('demo-materials').value,
-                        status: document.getElementById('demo-status').value
-                    },
-                    {
-                        taskName: 'Wall modifications',
-                        duration: document.getElementById('frame-days').value,
-                        workers: document.getElementById('frame-workers').value,
-                        materials: document.getElementById('frame-materials').value,
-                        status: document.getElementById('frame-status').value
-                    },
-                    {
-                        taskName: 'Rough-in wiring',
-                        duration: document.getElementById('elec-days').value,
-                        workers: document.getElementById('elec-workers').value,
-                        materials: document.getElementById('elec-materials').value,
-                        status: document.getElementById('elec-status').value
-                    }
-                ],
-                projectNotes: document.getElementById('notes').value
+                tasks: tasks,
+                notes: document.getElementById('notes').value,
+                lastSaved: new Date().toISOString()
             };
-            
-            // First get the file SHA
-            fetch('https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_PATH, {
-                headers: {
-                    'Authorization': 'token ' + token,
-                    'Accept': 'application/vnd.github.v3+json'
-                }
-            })
-            .then(response => response.json())
-            .then(fileData => {
-                // Now update the file
-                return fetch('https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_PATH, {
-                    method: 'PUT',
-                    headers: {
-                        'Authorization': 'token ' + token,
-                        'Accept': 'application/vnd.github.v3+json'
-                    },
-                    body: JSON.stringify({
-                        message: 'Update renovation data',
-                        content: btoa(JSON.stringify(data, null, 2)),
-                        sha: fileData.sha
-                    })
-                });
-            })
-            .then(response => {
-                if (response.ok) {
-                    document.getElementById('status').textContent = 'Saved to GitHub successfully!';
-                    document.getElementById('status').style.background = '#d4edda';
-                } else {
-                    throw new Error('Failed to save');
-                }
-            })
-            .catch(error => {
-                document.getElementById('status').textContent = 'Error saving: ' + error.message;
-                document.getElementById('status').style.background = '#f8d7da';
-                if (error.message.includes('401')) {
-                    localStorage.removeItem('githubToken');
-                    alert('Invalid token. Please try again.');
-                }
-            });
+            localStorage.setItem('renovationData', JSON.stringify(data));
+            showStatus('Data saved successfully!', 'success');
         }
-        
-        // Download backup
-        function downloadBackup() {
-            const data = {
-                tasks: [
-                    {
-                        duration: document.getElementById('demo-days').value,
-                        workers: document.getElementById('demo-workers').value,
-                        materials: document.getElementById('demo-materials').value
-                    }
-                ],
-                notes: document.getElementById('notes').value
-            };
+
+        // Render the table
+        function renderTable() {
+            const tbody = document.getElementById('taskTable');
+            tbody.innerHTML = '';
             
+            let totalDays = 0;
+            let totalHours = 0;
+            let totalLabor = 0;
+            let totalMaterials = 0;
+            
+            tasks.forEach((task, index) => {
+                const hours = task.days * task.workers * 8;
+                const labor = hours * HOURLY_RATE;
+                const total = labor + task.materials;
+                
+                totalDays += task.days;
+                totalHours += hours;
+                totalLabor += labor;
+                totalMaterials += task.materials;
+                
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${task.phase}</td>
+                    <td>${task.task}</td>
+                    <td><input type="number" value="${task.days}" onchange="updateTask(${index}, 'days', this.value)"></td>
+                    <td><input type="number" value="${task.workers}" onchange="updateTask(${index}, 'workers', this.value)"></td>
+                    <td>${hours}</td>
+                    <td>$${labor.toLocaleString()}</td>
+                    <td><input type="number" value="${task.materials}" onchange="updateTask(${index}, 'materials', this.value)"></td>
+                    <td>$${total.toLocaleString()}</td>
+                    <td>
+                        <select onchange="updateTask(${index}, 'status', this.value)" class="status-${task.status.toLowerCase()}">
+                            <option ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                            <option ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                        </select>
+                    </td>
+                    <td><input type="text" value="${task.contractor}" onchange="updateTask(${index}, 'contractor', this.value)" placeholder="Contractor"></td>
+                `;
+            });
+            
+            // Update totals
+            document.getElementById('totalDays').textContent = totalDays;
+            document.getElementById('totalHours').textContent = totalHours;
+            document.getElementById('totalLabor').textContent = '$' + totalLabor.toLocaleString();
+            document.getElementById('totalMaterials').textContent = '$' + totalMaterials.toLocaleString();
+            document.getElementById('totalCost').textContent = '$' + (totalLabor + totalMaterials).toLocaleString();
+        }
+
+        // Update a task
+        function updateTask(index, field, value) {
+            tasks[index][field] = field === 'days' || field === 'workers' || field === 'materials' 
+                ? parseInt(value) || 0 
+                : value;
+            renderTable();
+            saveData();
+        }
+
+        // Export data
+        function exportData() {
+            const data = {
+                tasks: tasks,
+                notes: document.getElementById('notes').value,
+                exported: new Date().toISOString()
+            };
             const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'renovation-backup.json';
+            a.download = 'renovation-data-' + new Date().toISOString().split('T')[0] + '.json';
             a.click();
+            showStatus('Data exported!', 'success');
         }
-        
-        // Load data on page load
-        window.onload = function() {
-            loadData();
-        };
+
+        // Import data
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        tasks = data.tasks || defaultTasks;
+                        document.getElementById('notes').value = data.notes || '';
+                        renderTable();
+                        saveData();
+                        showStatus('Data imported successfully!', 'success');
+                    } catch (err) {
+                        showStatus('Error importing file!', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // Reset data
+        function resetData() {
+            if (confirm('Are you sure you want to reset all data?')) {
+                localStorage.removeItem('renovationData');
+                tasks = defaultTasks;
+                document.getElementById('notes').value = '';
+                renderTable();
+                showStatus('Data reset to defaults', 'success');
+            }
+        }
+
+        // Show status message
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = type;
+            setTimeout(() => {
+                status.style.display = 'none';
+            }, 3000);
+        }
+
+        // Auto-save on notes change
+        document.getElementById('notes').addEventListener('change', saveData);
+
+        // Load on startup
+        loadData();
     </script>
 </body>
 </html>
