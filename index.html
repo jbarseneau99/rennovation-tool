@@ -175,68 +175,81 @@
     </div>
 
     <script>
-        // GitHub configuration
+        // GitHub configuration - MAKE SURE THESE ARE CORRECT
         const GITHUB_OWNER = 'jbarseneau99';
         const GITHUB_REPO = 'renovation-tool';
         const GITHUB_PATH = 'data.json';
         
-        // Load data from GitHub using API
+        // Load data from GitHub - try multiple methods
         function loadData() {
             document.getElementById('status').textContent = 'Loading from GitHub...';
             
-            // Use GitHub API instead of raw URL
-            const apiUrl = 'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_PATH;
+            // Method 1: Try jsdelivr CDN first
+            const cdnUrl = `https://cdn.jsdelivr.net/gh/${GITHUB_OWNER}/${GITHUB_REPO}@main/${GITHUB_PATH}`;
             
-            fetch(apiUrl)
+            fetch(cdnUrl)
                 .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Could not load data from GitHub API');
-                    }
+                    if (!response.ok) throw new Error('CDN failed');
                     return response.json();
                 })
-                .then(apiData => {
-                    // Decode the base64 content
-                    const content = atob(apiData.content);
-                    const data = JSON.parse(content);
-                    
-                    // Apply loaded data to form
-                    if (data.tasks && data.tasks.length > 0) {
-                        // First task
-                        if (data.tasks[0]) {
-                            document.getElementById('demo-days').value = data.tasks[0].duration || 2;
-                            document.getElementById('demo-workers').value = data.tasks[0].workers || 2;
-                            document.getElementById('demo-materials').value = data.tasks[0].materials || 100;
-                            document.getElementById('demo-status').value = data.tasks[0].status || 'Pending';
-                        }
-                        // Second task
-                        if (data.tasks[1]) {
-                            document.getElementById('frame-days').value = data.tasks[1].duration || 3;
-                            document.getElementById('frame-workers').value = data.tasks[1].workers || 2;
-                            document.getElementById('frame-materials').value = data.tasks[1].materials || 800;
-                            document.getElementById('frame-status').value = data.tasks[1].status || 'Pending';
-                        }
-                        // Third task
-                        if (data.tasks[2]) {
-                            document.getElementById('elec-days').value = data.tasks[2].duration || 2;
-                            document.getElementById('elec-workers').value = data.tasks[2].workers || 2;
-                            document.getElementById('elec-materials').value = data.tasks[2].materials || 600;
-                            document.getElementById('elec-status').value = data.tasks[2].status || 'Pending';
-                        }
-                    }
-                    
-                    if (data.projectNotes) {
-                        document.getElementById('notes').value = data.projectNotes;
-                    }
-                    
-                    const lastUpdate = data.lastUpdated ? new Date(data.lastUpdated).toLocaleString() : 'Never';
-                    document.getElementById('status').textContent = 'Loaded from GitHub - Last updated: ' + lastUpdate;
-                    document.getElementById('status').style.background = '#d4edda';
+                .then(data => {
+                    console.log('Loaded from CDN:', data);
+                    applyData(data);
                 })
                 .catch(error => {
-                    console.error('Error loading:', error);
-                    document.getElementById('status').textContent = 'Could not load data - ' + error.message;
+                    console.log('CDN failed, trying raw GitHub...');
+                    // Method 2: Try raw.githubusercontent.com
+                    return fetch(`https://raw.githubusercontent.com/${GITHUB_OWNER}/${GITHUB_REPO}/main/${GITHUB_PATH}`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Raw GitHub failed');
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Loaded from raw GitHub:', data);
+                            applyData(data);
+                        });
+                })
+                .catch(error => {
+                    console.error('All methods failed:', error);
+                    // Just use defaults
+                    document.getElementById('status').textContent = 'Could not load saved data - using defaults';
                     document.getElementById('status').style.background = '#fff3cd';
                 });
+        }
+        
+        // Apply data to form
+        function applyData(data) {
+            if (data.tasks && data.tasks.length > 0) {
+                // First task
+                if (data.tasks[0]) {
+                    document.getElementById('demo-days').value = data.tasks[0].duration || 2;
+                    document.getElementById('demo-workers').value = data.tasks[0].workers || 2;
+                    document.getElementById('demo-materials').value = data.tasks[0].materials || 100;
+                    document.getElementById('demo-status').value = data.tasks[0].status || 'Pending';
+                }
+                // Second task
+                if (data.tasks[1]) {
+                    document.getElementById('frame-days').value = data.tasks[1].duration || 3;
+                    document.getElementById('frame-workers').value = data.tasks[1].workers || 2;
+                    document.getElementById('frame-materials').value = data.tasks[1].materials || 800;
+                    document.getElementById('frame-status').value = data.tasks[1].status || 'Pending';
+                }
+                // Third task
+                if (data.tasks[2]) {
+                    document.getElementById('elec-days').value = data.tasks[2].duration || 2;
+                    document.getElementById('elec-workers').value = data.tasks[2].workers || 2;
+                    document.getElementById('elec-materials').value = data.tasks[2].materials || 600;
+                    document.getElementById('elec-status').value = data.tasks[2].status || 'Pending';
+                }
+            }
+            
+            if (data.projectNotes) {
+                document.getElementById('notes').value = data.projectNotes;
+            }
+            
+            const lastUpdate = data.lastUpdated ? new Date(data.lastUpdated).toLocaleString() : 'Never';
+            document.getElementById('status').textContent = 'Loaded successfully - Last updated: ' + lastUpdate;
+            document.getElementById('status').style.background = '#d4edda';
         }
         
         // Save data to GitHub
