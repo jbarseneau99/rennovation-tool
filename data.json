@@ -1,35 +1,14 @@
 {
-  "hourlyRate": 55,
-  "defaultWorkers": 2,
-  "lastUpdated": "",
-  "lastUpdatedBy": "",
-  "projectNotes": "Important Reminders:\n- Labor rate is editable at the top - adjust to match your local rates\n- Set default crew size and apply to all tasks with one click\n- Total hours = Days × Workers × 8 hours/day\n- Each phase has subtotals for tracking progress\n- Variance shows difference between estimated and actual costs\n- Green variance = under budget, Red variance = over budget\n- Schedule electrical inspection before closing walls\n- Order cabinets 6-8 weeks in advance\n- Coordinate appliance delivery with cabinet installation\n- Keep 10% budget contingency for unexpected issues\n- Material costs are estimates - get actual quotes from suppliers",
+  "lastUpdated": "2025-01-14T10:30:00Z",
   "tasks": [
-    {"taskName": "Remove cabinets & countertops", "duration": "2", "workers": "2", "materials": "100", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Remove flooring", "duration": "1", "workers": "2", "materials": "50", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Debris removal", "duration": "1", "workers": "1", "materials": "200", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Wall modifications", "duration": "3", "workers": "2", "materials": "800", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Window/door framing", "duration": "2", "workers": "2", "materials": "500", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Structural reinforcement", "duration": "2", "workers": "2", "materials": "400", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Rough-in wiring", "duration": "2", "workers": "2", "materials": "600", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Install outlets & switches", "duration": "1", "workers": "2", "materials": "300", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Lighting installation", "duration": "2", "workers": "1", "materials": "800", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Electrical inspection", "duration": "1", "workers": "1", "materials": "150", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Rough-in plumbing", "duration": "2", "workers": "2", "materials": "500", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Install sink & dishwasher lines", "duration": "1", "workers": "2", "materials": "300", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Gas line for stove", "duration": "1", "workers": "1", "materials": "200", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Plumbing inspection", "duration": "1", "workers": "1", "materials": "150", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Subfloor preparation", "duration": "1", "workers": "2", "materials": "300", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Install flooring", "duration": "3", "workers": "3", "materials": "2500", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Baseboards & trim", "duration": "2", "workers": "2", "materials": "400", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Drywall installation", "duration": "3", "workers": "2", "materials": "600", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Taping & mudding", "duration": "3", "workers": "2", "materials": "200", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Painting walls & ceiling", "duration": "3", "workers": "2", "materials": "400", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Install backsplash", "duration": "2", "workers": "2", "materials": "600", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Cabinet delivery & inspection", "duration": "1", "workers": "2", "materials": "6000", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Install upper cabinets", "duration": "2", "workers": "2", "materials": "100", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Install lower cabinets", "duration": "2", "workers": "2", "materials": "100", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Countertop installation", "duration": "2", "workers": "2", "materials": "3000", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""},
-    {"taskName": "Hardware & final adjustments", "duration": "1", "workers": "1", "materials": "300", "actualCost": "0", "contractor": "", "status": "status pending", "statusText": "Pending", "notes": ""}
-  ]
+    {
+      "taskName": "Remove cabinets",
+      "duration": "2",
+      "workers": "2", 
+      "materials": "100",
+      "status": "Pending"
+    },
+    // ... more tasks
+  ],
+  "projectNotes": "Your notes here..."
 }
