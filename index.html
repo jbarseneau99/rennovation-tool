@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitchen Renovation Project Plan</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            padding: 25px;
+            background: #f8f9fa;
+        }
+        
+        .summary-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .summary-card .label {
+            color: #666;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+        
+        .summary-card .value {
+            font-size: 1.6em;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .summary-card .unit {
+            font-size: 0.85em;
+            color: #999;
+        }
+        
+        .variance {
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+        
+        .variance.positive {
+            color: #28a745;
+        }
+        
+        .variance.negative {
+            color: #dc3545;
+        }
+        
+        #hourlyRate, #defaultWorkers {
+            width: 70px;
+            font-size: 1.6em;
+            font-weight: bold;
+            border: 2px solid transparent;
+            background: #f0f0f0;
+            text-align: center;
+            border-radius: 5px;
+            padding: 2px;
+        }
+        
+        #hourlyRate:hover, #defaultWorkers:hover {
+            border-color: #667eea;
+            background: white;
+        }
+        
+        #hourlyRate:focus, #defaultWorkers:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .table-container {
+            padding: 0 20px 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .table-wrapper {
+            min-width: 100%;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            min-width: 1200px;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        thead {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        th {
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+        }
+        
+        tbody tr:hover:not(.phase-total) {
+            background: #f8f9fa;
+        }
+        
+        .phase-cell {
+            font-weight: bold;
+            color: #667eea;
+            writing-mode: vertical-lr;
+            text-orientation: mixed;
+            text-align: center;
+            padding: 10px 5px;
+        }
+        
+        .phase-total {
+            background: #e8eaf6;
+            font-weight: bold;
+        }
+        
+        .phase-total td {
+            border-top: 2px solid #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+        
+        .labor-cost, .total-budget {
+            font-weight: 600;
+            color: #2c3e50;
+            white-space: nowrap;
+        }
+        
+        .status {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            display: inline-block;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status.in-progress {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status.completed {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .editable {
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 4px 6px;
+            border-radius: 4px;
+            width: 100%;
+            min-width: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .editable.narrow {
+            min-width: 40px;
+            max-width: 60px;
+        }
+        
+        .editable.medium {
+            min-width: 60px;
+            max-width: 80px;
+        }
+        
+        .editable:hover {
+            background: #f8f9fa;
+            border-color: #dee2e6;
+        }
+        
+        .editable:focus {
+            outline: none;
+            background: white;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .controls {
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .notes-section {
+            padding: 25px;
+            background: white;
+            margin: 0 20px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .notes-section h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        /* iPad and Tablet Responsive Design */
+        @media (max-width: 1024px) {
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .summary-cards {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                padding: 20px;
+            }
+            
+            .summary-card {
+                padding: 12px;
+            }
+            
+            .summary-card .value {
+                font-size: 1.4em;
+            }
+            
+            .table-container {
+                padding: 0 15px 15px;
+            }
+            
+            table {
+                min-width: 1000px;
+            }
+            
+            th, td {
+                padding: 10px 6px;
+                font-size: 0.8em;
+            }
+            
+            .phase-cell {
+                font-size: 0.9em;
+                padding: 8px 4px;
+            }
+            
+            .editable {
+                padding: 3px 5px;
+            }
+            
+            button {
+                padding: 8px 16px;
+                font-size: 0.9em;
+            }
+        }
+        
+        /* Mobile Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.6em;
+            }
+            
+            .header p {
+                font-size: 0.9em;
+            }
+            
+            .summary-cards {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            .summary-card {
+                padding: 10px;
+            }
+            
+            .summary-card .label {
+                font-size: 0.75em;
+            }
+            
+            .summary-card .value {
+                font-size: 1.2em;
+            }
+            
+            #hourlyRate, #defaultWorkers {
+                width: 60px;
+                font-size: 1.2em;
+            }
+            
+            .controls {
+                padding: 15px;
+            }
+            
+            button {
+                padding: 8px 14px;
+                font-size: 0.85em;
+            }
+            
+            table {
+                min-width: 900px;
+            }
+            
+            th, td {
+                padding: 8px 4px;
+                font-size: 0.75em;
+            }
+            
+            .phase-cell {
+                writing-mode: horizontal-tb;
+                text-orientation: mixed;
+                font-size: 0.85em;
+            }
+            
+            .status {
+                padding: 2px 8px;
+                font-size: 0.75em;
+            }
+            
+            .notes-section {
+                padding: 20px;
+                margin: 0 15px 15px;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .controls {
+                display: none;
+            }
+            
+            .container {
+                box-shadow: none;
+            }
+            
+            .table-container {
+                overflow: visible;
+            }
+            
+            table {
+                font-size: 10pt;
+            }
+            
+            .editable {
+                border: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 Kitchen Renovation Project Plan</h1>
+            <p>Multi-Phase Project Tracker with Labor Cost Calculator</p>
+        </div>
+        
+        <div class="summary-cards">
+            <div class="summary-card">
+                <div class="label">Labor Rate</div>
+                <div class="value">$<input type="number" id="hourlyRate" value="55" onchange="updateLaborCosts()"></div>
+                <div class="unit">per hour</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Default Crew</div>
+                <div class="value"><input type="number" id="defaultWorkers" value="2" onchange="updateLaborCosts()"></div>
+                <div class="unit">workers</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Total Estimated</div>
+                <div class="value">$<span id="totalEstimated">0</span></div>
+                <div class="variance" id="totalVariance"></div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Total Actual</div>
+                <div class="value">$<span id="totalActual">0</span></div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Labor Estimated</div>
+                <div class="value">$<span id="totalLaborCost">0</span></div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Materials</div>
+                <div class="value">$<span id="totalMaterials">0</span></div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Total Hours</div>
+                <div class="value"><span id="totalHours">0</span></div>
+                <div class="unit">hours</div>
+            </div>
+            <div class="summary-card">
+                <div class="label">Total Days</div>
+                <div class="value"><span id="totalDuration">0</span></div>
+                <div class="unit">days</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button onclick="updateLaborCosts()">Recalculate All</button>
+            <button onclick="exportToCSV()">Export to CSV</button>
+            <button onclick="exportData()">Save Backup</button>
+            <button onclick="importData()">Load Backup</button>
+            <button onclick="printPlan()">Print Plan</button>
+            <button onclick="applyDefaultWorkers()">Apply Default Crew</button>
+            <button onclick="resetPlan()">Reset Plan</button>
+        </div>
+        
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table id="renovationTable">
+                    <thead>
+                        <tr>
+                            <th>Phase</th>
+                            <th>Task</th>
+                            <th>Days</th>
+                            <th>Workers</th>
+                            <th>Total Hours</th>
+                            <th>Labor Cost</th>
+                            <th>Materials</th>
+                            <th>Est. Total</th>
+                            <th>Actual Cost</th>
+                            <th>Variance</th>
+                            <th>Contractor</th>
+                            <th>Status</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Phase 1: Demolition -->
+                        <tr>
+                            <td rowspan="4" class="phase-cell">1. Demolition</td>
+                            <td>Remove cabinets & countertops</td>
+                            <td><input type="number" class="editable narrow duration" value="2" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">32</td>
+                            <td class="labor-cost">$1,760</td>
+                            <td><input type="number" class="editable medium materials" value="100" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$1,860</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Remove flooring</td>
+                            <td><input type="number" class="editable narrow duration" value="1" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">16</td>
+                            <td class="labor-cost">$880</td>
+                            <td><input type="number" class="editable medium materials" value="50" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$930</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Debris removal</td>
+                            <td><input type="number" class="editable narrow duration" value="1" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="1" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">8</td>
+                            <td class="labor-cost">$440</td>
+                            <td><input type="number" class="editable medium materials" value="200" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$640</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr class="phase-total">
+                            <td colspan="4"><strong>Phase 1 Total:</strong></td>
+                            <td class="phase-labor-cost">$3,080</td>
+                            <td class="phase-materials">$350</td>
+                            <td class="phase-estimated">$3,430</td>
+                            <td class="phase-actual">$0</td>
+                            <td class="phase-variance">-</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        
+                        <!-- Phase 2: Framing -->
+                        <tr>
+                            <td rowspan="4" class="phase-cell">2. Framing</td>
+                            <td>Wall modifications</td>
+                            <td><input type="number" class="editable narrow duration" value="3" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">48</td>
+                            <td class="labor-cost">$2,640</td>
+                            <td><input type="number" class="editable medium materials" value="800" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$3,440</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Window/door framing</td>
+                            <td><input type="number" class="editable narrow duration" value="2" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">32</td>
+                            <td class="labor-cost">$1,760</td>
+                            <td><input type="number" class="editable medium materials" value="500" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$2,260</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Structural reinforcement</td>
+                            <td><input type="number" class="editable narrow duration" value="2" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">32</td>
+                            <td class="labor-cost">$1,760</td>
+                            <td><input type="number" class="editable medium materials" value="400" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$2,160</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr class="phase-total">
+                            <td colspan="4"><strong>Phase 2 Total:</strong></td>
+                            <td class="phase-labor-cost">$6,160</td>
+                            <td class="phase-materials">$1,700</td>
+                            <td class="phase-estimated">$7,860</td>
+                            <td class="phase-actual">$0</td>
+                            <td class="phase-variance">-</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        
+                        <!-- Phase 3: Electrical -->
+                        <tr>
+                            <td rowspan="5" class="phase-cell">3. Electrical</td>
+                            <td>Rough-in wiring</td>
+                            <td><input type="number" class="editable narrow duration" value="2" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">32</td>
+                            <td class="labor-cost">$1,760</td>
+                            <td><input type="number" class="editable medium materials" value="600" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$2,360</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Install outlets & switches</td>
+                            <td><input type="number" class="editable narrow duration" value="1" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">16</td>
+                            <td class="labor-cost">$880</td>
+                            <td><input type="number" class="editable medium materials" value="300" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$1,180</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Lighting installation</td>
+                            <td><input type="number" class="editable narrow duration" value="2" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="1" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">16</td>
+                            <td class="labor-cost">$880</td>
+                            <td><input type="number" class="editable medium materials" value="800" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$1,680</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Electrical inspection</td>
+                            <td><input type="number" class="editable narrow duration" value="1" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="1" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">8</td>
+                            <td class="labor-cost">$440</td>
+                            <td><input type="number" class="editable medium materials" value="150" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$590</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Inspector"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr class="phase-total">
+                            <td colspan="4"><strong>Phase 3 Total:</strong></td>
+                            <td class="phase-labor-cost">$3,960</td>
+                            <td class="phase-materials">$1,850</td>
+                            <td class="phase-estimated">$5,810</td>
+                            <td class="phase-actual">$0</td>
+                            <td class="phase-variance">-</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        
+                        <!-- Phase 4: Plumbing -->
+                        <tr>
+                            <td rowspan="5" class="phase-cell">4. Plumbing</td>
+                            <td>Rough-in plumbing</td>
+                            <td><input type="number" class="editable narrow duration" value="2" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">32</td>
+                            <td class="labor-cost">$1,760</td>
+                            <td><input type="number" class="editable medium materials" value="500" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$2,260</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Install sink & dishwasher lines</td>
+                            <td><input type="number" class="editable narrow duration" value="1" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">16</td>
+                            <td class="labor-cost">$880</td>
+                            <td><input type="number" class="editable medium materials" value="300" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$1,180</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Gas line for stove</td>
+                            <td><input type="number" class="editable narrow duration" value="1" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="1" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">8</td>
+                            <td class="labor-cost">$440</td>
+                            <td><input type="number" class="editable medium materials" value="200" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$640</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Plumbing inspection</td>
+                            <td><input type="number" class="editable narrow duration" value="1" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="1" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">8</td>
+                            <td class="labor-cost">$440</td>
+                            <td><input type="number" class="editable medium materials" value="150" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$590</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Inspector"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr class="phase-total">
+                            <td colspan="4"><strong>Phase 4 Total:</strong></td>
+                            <td class="phase-labor-cost">$3,520</td>
+                            <td class="phase-materials">$1,150</td>
+                            <td class="phase-estimated">$4,670</td>
+                            <td class="phase-actual">$0</td>
+                            <td class="phase-variance">-</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        
+                        <!-- Phase 5: Flooring -->
+                        <tr>
+                            <td rowspan="4" class="phase-cell">5. Flooring</td>
+                            <td>Subfloor preparation</td>
+                            <td><input type="number" class="editable narrow duration" value="1" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">16</td>
+                            <td class="labor-cost">$880</td>
+                            <td><input type="number" class="editable medium materials" value="300" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$1,180</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Install flooring</td>
+                            <td><input type="number" class="editable narrow duration" value="3" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="3" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">72</td>
+                            <td class="labor-cost">$3,960</td>
+                            <td><input type="number" class="editable medium materials" value="2500" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$6,460</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Baseboards & trim</td>
+                            <td><input type="number" class="editable narrow duration" value="2" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">32</td>
+                            <td class="labor-cost">$1,760</td>
+                            <td><input type="number" class="editable medium materials" value="400" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$2,160</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr class="phase-total">
+                            <td colspan="4"><strong>Phase 5 Total:</strong></td>
+                            <td class="phase-labor-cost">$6,600</td>
+                            <td class="phase-materials">$3,200</td>
+                            <td class="phase-estimated">$9,800</td>
+                            <td class="phase-actual">$0</td>
+                            <td class="phase-variance">-</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        
+                        <!-- Phase 6: Finishing (Paneling) -->
+                        <tr>
+                            <td rowspan="5" class="phase-cell">6. Finishing</td>
+                            <td>Drywall installation</td>
+                            <td><input type="number" class="editable narrow duration" value="3" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">48</td>
+                            <td class="labor-cost">$2,640</td>
+                            <td><input type="number" class="editable medium materials" value="600" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$3,240</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Taping & mudding</td>
+                            <td><input type="number" class="editable narrow duration" value="3" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">48</td>
+                            <td class="labor-cost">$2,640</td>
+                            <td><input type="number" class="editable medium materials" value="200" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$2,840</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Painting walls & ceiling</td>
+                            <td><input type="number" class="editable narrow duration" value="3" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">48</td>
+                            <td class="labor-cost">$2,640</td>
+                            <td><input type="number" class="editable medium materials" value="400" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$3,040</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Install backsplash</td>
+                            <td><input type="number" class="editable narrow duration" value="2" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">32</td>
+                            <td class="labor-cost">$1,760</td>
+                            <td><input type="number" class="editable medium materials" value="600" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$2,360</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr class="phase-total">
+                            <td colspan="4"><strong>Phase 6 Total:</strong></td>
+                            <td class="phase-labor-cost">$9,680</td>
+                            <td class="phase-materials">$1,800</td>
+                            <td class="phase-estimated">$11,480</td>
+                            <td class="phase-actual">$0</td>
+                            <td class="phase-variance">-</td>
+                            <td colspan="3"></td>
+                        </tr>
+                        
+                        <!-- Phase 7: Cabinets -->
+                        <tr>
+                            <td rowspan="6" class="phase-cell">7. Cabinets</td>
+                            <td>Cabinet delivery & inspection</td>
+                            <td><input type="number" class="editable narrow duration" value="1" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">16</td>
+                            <td class="labor-cost">$880</td>
+                            <td><input type="number" class="editable medium materials" value="6000" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$6,880</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Supplier"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Install upper cabinets</td>
+                            <td><input type="number" class="editable narrow duration" value="2" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">32</td>
+                            <td class="labor-cost">$1,760</td>
+                            <td><input type="number" class="editable medium materials" value="100" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$1,860</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Install lower cabinets</td>
+                            <td><input type="number" class="editable narrow duration" value="2" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">32</td>
+                            <td class="labor-cost">$1,760</td>
+                            <td><input type="number" class="editable medium materials" value="100" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$1,860</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Countertop installation</td>
+                            <td><input type="number" class="editable narrow duration" value="2" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="2" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">32</td>
+                            <td class="labor-cost">$1,760</td>
+                            <td><input type="number" class="editable medium materials" value="3000" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$4,760</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr>
+                            <td>Hardware & final adjustments</td>
+                            <td><input type="number" class="editable narrow duration" value="1" onchange="updateLaborCosts()"></td>
+                            <td><input type="number" class="editable narrow workers" value="1" onchange="updateLaborCosts()"></td>
+                            <td class="total-hours">8</td>
+                            <td class="labor-cost">$440</td>
+                            <td><input type="number" class="editable medium materials" value="300" onchange="updateLaborCosts()"></td>
+                            <td class="total-budget">$740</td>
+                            <td><input type="number" class="editable medium actual-cost" value="0" onchange="updateLaborCosts()"></td>
+                            <td class="variance">-</td>
+                            <td><input type="text" class="editable" placeholder="Contractor"></td>
+                            <td><span class="status pending">Pending</span></td>
+                            <td><input type="text" class="editable" placeholder="Notes"></td>
+                        </tr>
+                        <tr class="phase-total">
+                            <td colspan="4"><strong>Phase 7 Total:</strong></td>
+                            <td class="phase-labor-cost">$6,600</td>
+                            <td class="phase-materials">$9,500</td>
+                            <td class="phase-estimated">$16,100</td>
+                            <td class="phase-actual">$0</td>
+                            <td class="phase-variance">-</td>
+                            <td colspan="3"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="notes-section">
+            <h3>Project Notes</h3>
+            <textarea placeholder="Add general project notes, important reminders, permit numbers, etc.">
+Important Reminders:
+- Labor rate is editable at the top - adjust to match your local rates
+- Set default crew size and apply to all tasks with one click
+- Total hours = Days × Workers × 8 hours/day
+- Each phase has subtotals for tracking progress
+- Variance shows difference between estimated and actual costs
+- Green variance = under budget, Red variance = over budget
+- Schedule electrical inspection before closing walls
+- Order cabinets 6-8 weeks in advance
+- Coordinate appliance delivery with cabinet installation
+- Keep 10% budget contingency for unexpected issues
+- Material costs are estimates - get actual quotes from suppliers
+            </textarea>
+        </div>
+    </div>
+    
+    <script>
+        // Apply default workers to all tasks
+        function applyDefaultWorkers() {
+            const defaultWorkers = document.getElementById('defaultWorkers').value;
+            const workerInputs = document.querySelectorAll('.workers');
+            workerInputs.forEach(input => {
+                input.value = defaultWorkers;
+            });
+            updateLaborCosts();
+        }
+        
+        // Update labor costs based on hourly rate and workers
+        function updateLaborCosts() {
+            const hourlyRate = parseFloat(document.getElementById('hourlyRate').value) || 0;
+            const rows = document.querySelectorAll('#renovationTable tbody tr:not(.phase-total)');
+            let totalLabor = 0;
+            let totalMaterials = 0;
+            let totalHours = 0;
+            let totalEstimated = 0;
+            let totalActual = 0;
+            let totalDuration = 0;
+            
+            // Track phase totals
+            let phaseTotals = {};
+            let currentPhase = '';
+            
+            rows.forEach(row => {
+                // Get duration and workers
+                const durationInput = row.querySelector('.duration');
+                const workersInput = row.querySelector('.workers');
+                
+                if (durationInput && workersInput) {
+                    // Determine current phase
+                    const phaseCell = row.querySelector('.phase-cell');
+                    if (phaseCell) {
+                        currentPhase = phaseCell.textContent.trim();
+                        if (!phaseTotals[currentPhase]) {
+                            phaseTotals[currentPhase] = {
+                                labor: 0,
+                                materials: 0,
+                                estimated: 0,
+                                actual: 0
+                            };
+                        }
+                    }
+                    
+                    const days = parseFloat(durationInput.value) || 0;
+                    const workers = parseFloat(workersInput.value) || 0;
+                    const hours = days * workers * 8; // 8 hours per day
+                    
+                    totalDuration += days;
+                    totalHours += hours;
+                    
+                    // Update total hours cell
+                    const totalHoursCell = row.querySelector('.total-hours');
+                    if (totalHoursCell) {
+                        totalHoursCell.textContent = hours;
+                    }
+                    
+                    // Calculate and update labor cost
+                    const laborCost = hours * hourlyRate;
+                    totalLabor += laborCost;
+                    const laborCostCell = row.querySelector('.labor-cost');
+                    if (laborCostCell) {
+                        laborCostCell.textContent = '$' + laborCost.toFixed(0).toLocaleString();
+                    }
+                    
+                    // Get materials cost
+                    const materialsInput = row.querySelector('.materials');
+                    const materials = parseFloat(materialsInput?.value) || 0;
+                    totalMaterials += materials;
+                    
+                    // Calculate total budget for this row
+                    const rowTotal = laborCost + materials;
+                    totalEstimated += rowTotal;
+                    
+                    // Update total budget cell
+                    const totalBudgetCell = row.querySelector('.total-budget');
+                    if (totalBudgetCell) {
+                        totalBudgetCell.textContent = '$' + rowTotal.toFixed(0).toLocaleString();
+                    }
+                    
+                    // Get actual cost
+                    const actualInput = row.querySelector('.actual-cost');
+                    const actualCost = parseFloat(actualInput?.value) || 0;
+                    totalActual += actualCost;
+                    
+                    // Calculate and display variance
+                    const varianceCell = row.querySelector('.variance');
+                    if (varianceCell && actualCost > 0) {
+                        const variance = rowTotal - actualCost;
+                        varianceCell.textContent = (variance >= 0 ? '+$' : '-$') + Math.abs(variance).toFixed(0);
+                        varianceCell.className = 'variance ' + (variance >= 0 ? 'positive' : 'negative');
+                    } else if (varianceCell) {
+                        varianceCell.textContent = '-';
+                        varianceCell.className = 'variance';
+                    }
+                    
+                    // Add to phase totals
+                    if (currentPhase && phaseTotals[currentPhase]) {
+                        phaseTotals[currentPhase].labor += laborCost;
+                        phaseTotals[currentPhase].materials += materials;
+                        phaseTotals[currentPhase].estimated += rowTotal;
+                        phaseTotals[currentPhase].actual += actualCost;
+                    }
+                }
+            });
+            
+            // Update phase total rows
+            const phaseTotalRows = document.querySelectorAll('.phase-total');
+            phaseTotalRows.forEach((row, index) => {
+                const phaseKey = `${index + 1}. ${['Demolition', 'Framing', 'Electrical', 'Plumbing', 'Flooring', 'Finishing', 'Cabinets'][index]}`;
+                if (phaseTotals[phaseKey]) {
+                    const phaseData = phaseTotals[phaseKey];
+                    
+                    row.querySelector('.phase-labor-cost').textContent = '$' + phaseData.labor.toFixed(0).toLocaleString();
+                    row.querySelector('.phase-materials').textContent = '$' + phaseData.materials.toFixed(0).toLocaleString();
+                    row.querySelector('.phase-estimated').textContent = '$' + phaseData.estimated.toFixed(0).toLocaleString();
+                    row.querySelector('.phase-actual').textContent = '$' + phaseData.actual.toFixed(0).toLocaleString();
+                    
+                    const varianceCell = row.querySelector('.phase-variance');
+                    if (phaseData.actual > 0) {
+                        const variance = phaseData.estimated - phaseData.actual;
+                        varianceCell.textContent = (variance >= 0 ? '+$' : '-$') + Math.abs(variance).toFixed(0).toLocaleString();
+                        varianceCell.className = 'phase-variance ' + (variance >= 0 ? 'positive' : 'negative');
+                    } else {
+                        varianceCell.textContent = '-';
+                        varianceCell.className = 'phase-variance';
+                    }
+                }
+            });
+            
+            // Update summary cards
+            document.getElementById('totalLaborCost').textContent = totalLabor.toFixed(0).toLocaleString();
+            document.getElementById('totalMaterials').textContent = totalMaterials.toFixed(0).toLocaleString();
+            document.getElementById('totalEstimated').textContent = totalEstimated.toFixed(0).toLocaleString();
+            document.getElementById('totalActual').textContent = totalActual.toFixed(0).toLocaleString();
+            document.getElementById('totalHours').textContent = totalHours.toFixed(0);
+            document.getElementById('totalDuration').textContent = totalDuration.toFixed(0);
+            
+            // Update total variance
+            const totalVarianceEl = document.getElementById('totalVariance');
+            if (totalActual > 0) {
+                const totalVariance = totalEstimated - totalActual;
+                totalVarianceEl.textContent = (totalVariance >= 0 ? 'Under: +$' : 'Over: -$') + Math.abs(totalVariance).toFixed(0).toLocaleString();
+                totalVarianceEl.className = 'variance ' + (totalVariance >= 0 ? 'positive' : 'negative');
+            } else {
+                totalVarianceEl.textContent = '';
+            }
+        }
+        
+        // Export to CSV
+        function exportToCSV() {
+            const table = document.getElementById('renovationTable');
+            const rows = table.querySelectorAll('tr');
+            let csv = [];
+            
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('td, th');
+                const csvRow = [];
+                cols.forEach(col => {
+                    const input = col.querySelector('input');
+                    const text = input ? input.value : col.textContent;
+                    csvRow.push('"' + text.replace(/"/g, '""') + '"');
+                });
+                csv.push(csvRow.join(','));
+            });
+            
+            const csvContent = csv.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'kitchen_renovation_plan.csv';
+            a.click();
+        }
+        
+        // Print plan
+        function printPlan() {
+            window.print();
+        }
+        
+        // Reset plan
+        function resetPlan() {
+            if (confirm('Are you sure you want to reset all data? This cannot be undone.')) {
+                location.reload();
+            }
+        }
+        
+        // Status toggle
+        document.querySelectorAll('.status').forEach(status => {
+            status.addEventListener('click', function() {
+                const states = ['pending', 'in-progress', 'completed'];
+                const texts = ['Pending', 'In Progress', 'Completed'];
+                
+                let currentIndex = states.findIndex(state => this.classList.contains(state));
+                this.classList.remove(states[currentIndex]);
+                
+                currentIndex = (currentIndex + 1) % states.length;
+                this.classList.add(states[currentIndex]);
+                this.textContent = texts[currentIndex];
+            });
+        });
+        
+        // Initialize on load
+        updateLaborCosts();
+    </script>
+</body>
+</html>
