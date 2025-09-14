@@ -1,4 +1,35 @@
-<!DOCTYPE html>
+// Load data from GitHub
+        function loadData() {
+            document.getElementById('status').textContent = 'Loading from GitHub...';
+            
+            // Try multiple methods to ensure we get the data
+            const rawUrl = 'https://raw.githubusercontent.com/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/main/' + GITHUB_PATH;
+            const apiUrl = 'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_PATH;
+            
+            // First try raw URL with cache bypass
+            fetch(rawUrl + '?t=' + Date.now())
+                .then(response => {
+                    if (!response.ok) {
+                        // If raw fails, try API
+                        return fetch(apiUrl)
+                            .then(apiResponse => apiResponse.json())
+                            .then(apiData => {
+                                // Decode base64 content from API
+                                const content = atob(apiData.content);
+                                return JSON.parse(content);
+                            });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Apply loaded data to form
+                    if (data.tasks && data.tasks.length > 0) {
+                        // First task
+                        if (data.tasks[0]) {
+                            document.getElementById('demo-days').value = data.tasks[0].duration || 2;
+                            document.getElementById('demo-workers').value = data.tasks[0].workers || 2;
+                            document.getElementById('demo-materials').value = data.tasks[0].materials || 100;
+                            document.getElementById('demo-status').value = data.tasks[0].status || '<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -74,7 +105,6 @@
         <h1>🏠 Kitchen Renovation Tracker</h1>
         
         <div class="controls">
-            <button class="load-btn" onclick="loadData()">🔄 Load from GitHub</button>
             <button class="save-btn" onclick="saveData()">💾 Save to GitHub</button>
             <button onclick="downloadBackup()">📥 Download Backup</button>
         </div>
@@ -150,19 +180,25 @@
         const GITHUB_REPO = 'renovation-tool';
         const GITHUB_PATH = 'data.json';
         
-        // Load data from GitHub
+        // Load data from GitHub using API
         function loadData() {
             document.getElementById('status').textContent = 'Loading from GitHub...';
-            const url = 'https://raw.githubusercontent.com/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/main/' + GITHUB_PATH + '?t=' + Date.now();
             
-            fetch(url)
+            // Use GitHub API instead of raw URL
+            const apiUrl = 'https://api.github.com/repos/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/contents/' + GITHUB_PATH;
+            
+            fetch(apiUrl)
                 .then(response => {
                     if (!response.ok) {
-                        throw new Error('Could not load data');
+                        throw new Error('Could not load data from GitHub API');
                     }
                     return response.json();
                 })
-                .then(data => {
+                .then(apiData => {
+                    // Decode the base64 content
+                    const content = atob(apiData.content);
+                    const data = JSON.parse(content);
+                    
                     // Apply loaded data to form
                     if (data.tasks && data.tasks.length > 0) {
                         // First task
@@ -198,7 +234,7 @@
                 })
                 .catch(error => {
                     console.error('Error loading:', error);
-                    document.getElementById('status').textContent = 'Could not auto-load data - ' + error.message;
+                    document.getElementById('status').textContent = 'Could not load data - ' + error.message;
                     document.getElementById('status').style.background = '#fff3cd';
                 });
         }
