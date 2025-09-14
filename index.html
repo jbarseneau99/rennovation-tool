@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -152,6 +152,7 @@
         
         // Load data from GitHub
         function loadData() {
+            document.getElementById('status').textContent = 'Loading from GitHub...';
             const url = 'https://raw.githubusercontent.com/' + GITHUB_OWNER + '/' + GITHUB_REPO + '/main/' + GITHUB_PATH + '?t=' + Date.now();
             
             fetch(url)
@@ -164,21 +165,41 @@
                 .then(data => {
                     // Apply loaded data to form
                     if (data.tasks && data.tasks.length > 0) {
-                        document.getElementById('demo-days').value = data.tasks[0].duration || 2;
-                        document.getElementById('demo-workers').value = data.tasks[0].workers || 2;
-                        document.getElementById('demo-materials').value = data.tasks[0].materials || 100;
+                        // First task
+                        if (data.tasks[0]) {
+                            document.getElementById('demo-days').value = data.tasks[0].duration || 2;
+                            document.getElementById('demo-workers').value = data.tasks[0].workers || 2;
+                            document.getElementById('demo-materials').value = data.tasks[0].materials || 100;
+                            document.getElementById('demo-status').value = data.tasks[0].status || 'Pending';
+                        }
+                        // Second task
+                        if (data.tasks[1]) {
+                            document.getElementById('frame-days').value = data.tasks[1].duration || 3;
+                            document.getElementById('frame-workers').value = data.tasks[1].workers || 2;
+                            document.getElementById('frame-materials').value = data.tasks[1].materials || 800;
+                            document.getElementById('frame-status').value = data.tasks[1].status || 'Pending';
+                        }
+                        // Third task
+                        if (data.tasks[2]) {
+                            document.getElementById('elec-days').value = data.tasks[2].duration || 2;
+                            document.getElementById('elec-workers').value = data.tasks[2].workers || 2;
+                            document.getElementById('elec-materials').value = data.tasks[2].materials || 600;
+                            document.getElementById('elec-status').value = data.tasks[2].status || 'Pending';
+                        }
                     }
                     
                     if (data.projectNotes) {
                         document.getElementById('notes').value = data.projectNotes;
                     }
                     
-                    document.getElementById('status').textContent = 'Loaded from GitHub successfully!';
+                    const lastUpdate = data.lastUpdated ? new Date(data.lastUpdated).toLocaleString() : 'Never';
+                    document.getElementById('status').textContent = 'Loaded from GitHub - Last updated: ' + lastUpdate;
                     document.getElementById('status').style.background = '#d4edda';
                 })
                 .catch(error => {
-                    document.getElementById('status').textContent = 'Error loading: ' + error.message;
-                    document.getElementById('status').style.background = '#f8d7da';
+                    console.error('Error loading:', error);
+                    document.getElementById('status').textContent = 'Could not auto-load data - ' + error.message;
+                    document.getElementById('status').style.background = '#fff3cd';
                 });
         }
         
