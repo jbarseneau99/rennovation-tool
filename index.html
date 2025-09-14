@@ -3,108 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kitchen Renovation Tracker - Local Storage</title>
+    <title>Cheryl's Kitchen Renovation Tracker</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f0f0f0;
-            padding: 20px;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
         }
-        h1 {
-            color: #333;
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
             text-align: center;
-            margin-bottom: 10px;
         }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
         .info {
             text-align: center;
-            color: #666;
-            margin-bottom: 20px;
-            padding: 10px;
+            margin: 20px;
+            padding: 15px;
             background: #e8f5e9;
-            border-radius: 5px;
+            border-radius: 10px;
+            font-size: 1.1em;
         }
+        
         .controls {
-            text-align: center;
-            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 20px;
+            background: #f8f9fa;
         }
+        
         button {
-            padding: 10px 20px;
-            margin: 5px;
+            padding: 12px 24px;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
             color: white;
+            font-weight: 600;
+            transition: transform 0.2s;
         }
-        .save-btn {
-            background: #28a745;
+        
+        button:hover {
+            transform: translateY(-2px);
         }
-        .export-btn {
-            background: #007bff;
+        
+        .save-btn { background: #28a745; }
+        .export-btn { background: #007bff; }
+        .import-btn { background: #6c757d; }
+        .reset-btn { background: #dc3545; }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px;
         }
-        .import-btn {
-            background: #6c757d;
-        }
-        .reset-btn {
-            background: #dc3545;
-        }
+        
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            font-size: 14px;
         }
+        
         th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
+            padding: 12px 8px;
             text-align: left;
+            border: 1px solid #dee2e6;
         }
+        
         th {
             background: #667eea;
             color: white;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
+        
+        tbody tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .phase-header {
+            background: #e3f2fd;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        
+        .phase-subtotal {
+            background: #fff3cd;
+            font-weight: bold;
+            color: #856404;
+        }
+        
+        .grand-total {
+            background: #d1ecf1;
+            font-weight: bold;
+            color: #0c5460;
+            font-size: 1.1em;
+        }
+        
         input[type="number"], input[type="text"], select {
             width: 100%;
-            padding: 5px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
+            padding: 6px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
         }
+        
+        select.status-pending { background: #fff3cd; }
+        select.status-in-progress { background: #cce5ff; }
+        select.status-completed { background: #d4edda; }
+        
         textarea {
             width: 100%;
-            height: 100px;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-family: Arial, sans-serif;
+            height: 120px;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 16px;
+            resize: vertical;
         }
-        .status-pending { background: #fff3cd; }
-        .status-progress { background: #cce5ff; }
-        .status-completed { background: #d4edda; }
+        
+        .notes-section {
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
         #status {
+            margin: 20px;
+            padding: 15px;
+            border-radius: 8px;
             text-align: center;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
             display: none;
+            font-weight: 600;
         }
-        .success { background: #d4edda; color: #155724; display: block; }
-        .error { background: #f8d7da; color: #721c24; display: block; }
+        
+        .success { 
+            background: #d4edda; 
+            color: #155724; 
+            border: 1px solid #c3e6cb;
+            display: block; 
+        }
+        
+        .error { 
+            background: #f8d7da; 
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block; 
+        }
+        
+        /* iPad and Tablet Responsive */
+        @media (max-width: 1024px) {
+            h1 { font-size: 2em; }
+            
+            .controls {
+                padding: 15px;
+            }
+            
+            button {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            
+            table {
+                font-size: 12px;
+            }
+            
+            th, td {
+                padding: 8px 4px;
+            }
+            
+            input[type="number"], input[type="text"], select {
+                padding: 4px;
+                font-size: 12px;
+            }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            h1 { 
+                font-size: 1.5em; 
+            }
+            
+            .header {
+                padding: 20px 15px;
+            }
+            
+            .info {
+                font-size: 0.9em;
+                margin: 10px;
+                padding: 10px;
+            }
+            
+            .controls {
+                padding: 10px;
+                gap: 5px;
+            }
+            
+            button {
+                padding: 8px 16px;
+                font-size: 13px;
+                flex: 1 1 45%;
+            }
+            
+            .table-wrapper {
+                margin: 10px 5px;
+            }
+            
+            table {
+                font-size: 11px;
+                min-width: 800px;
+            }
+            
+            th, td {
+                padding: 6px 3px;
+            }
+            
+            .hide-mobile {
+                display: none;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            body { background: white; }
+            .controls { display: none; }
+            .info { display: none; }
+            button { display: none; }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🏠 Kitchen Renovation Tracker</h1>
+        <div class="header">
+            <h1>🏠 Cheryl's Kitchen Renovation Tracker</h1>
+            <p style="opacity: 0.9;">Complete Project Management System</p>
+        </div>
+        
         <div class="info">
             ✅ All data saves automatically in your browser<br>
-            📱 Works offline - no internet needed<br>
+            📱 Optimized for iPad and all devices<br>
             💾 Export/Import to share between devices
         </div>
         
@@ -117,46 +284,48 @@
             <button class="reset-btn" onclick="resetData()">🔄 Reset All</button>
         </div>
         
-        <table>
-            <thead>
-                <tr>
-                    <th>Phase</th>
-                    <th>Task</th>
-                    <th>Days</th>
-                    <th>Workers</th>
-                    <th>Hours</th>
-                    <th>Labor ($55/hr)</th>
-                    <th>Materials ($)</th>
-                    <th>Total Cost</th>
-                    <th>Status</th>
-                    <th>Contractor</th>
-                </tr>
-            </thead>
-            <tbody id="taskTable">
-                <!-- Tasks will be loaded here -->
-            </tbody>
-            <tfoot>
-                <tr style="font-weight: bold; background: #f0f0f0;">
-                    <td colspan="2">TOTALS</td>
-                    <td id="totalDays">0</td>
-                    <td>-</td>
-                    <td id="totalHours">0</td>
-                    <td id="totalLabor">$0</td>
-                    <td id="totalMaterials">$0</td>
-                    <td id="totalCost">$0</td>
-                    <td colspan="2">-</td>
-                </tr>
-            </tfoot>
-        </table>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Task</th>
+                        <th>Days</th>
+                        <th>Workers</th>
+                        <th class="hide-mobile">Hours</th>
+                        <th>Labor ($55/hr)</th>
+                        <th>Materials</th>
+                        <th>Total Cost</th>
+                        <th>Status</th>
+                        <th class="hide-mobile">Contractor</th>
+                    </tr>
+                </thead>
+                <tbody id="taskTable">
+                    <!-- Tasks will be loaded here -->
+                </tbody>
+                <tfoot>
+                    <tr class="grand-total">
+                        <td colspan="2">GRAND TOTAL</td>
+                        <td id="totalDays">0</td>
+                        <td>-</td>
+                        <td class="hide-mobile" id="totalHours">0</td>
+                        <td id="totalLabor">$0</td>
+                        <td id="totalMaterials">$0</td>
+                        <td id="totalCost">$0</td>
+                        <td colspan="2">-</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
         
-        <div>
+        <div class="notes-section">
             <h3>Project Notes</h3>
-            <textarea id="notes" placeholder="Enter your project notes, reminders, permit numbers, etc."></textarea>
+            <textarea id="notes" placeholder="Enter project notes, reminders, permit numbers, special instructions..."></textarea>
         </div>
     </div>
 
     <script>
-        // Default data structure
+        // Default data structure with all phases
         const defaultTasks = [
             // Demolition
             { phase: "1. Demolition", task: "Remove cabinets & countertops", days: 2, workers: 2, materials: 100, status: "Pending", contractor: "" },
@@ -198,13 +367,13 @@
 
         // Load data from localStorage
         function loadData() {
-            const saved = localStorage.getItem('renovationData');
+            const saved = localStorage.getItem('cheryls_renovationData');
             if (saved) {
                 const data = JSON.parse(saved);
                 tasks = data.tasks || defaultTasks;
                 document.getElementById('notes').value = data.notes || '';
             } else {
-                tasks = defaultTasks;
+                tasks = [...defaultTasks];
             }
             renderTable();
         }
@@ -216,64 +385,129 @@
                 notes: document.getElementById('notes').value,
                 lastSaved: new Date().toISOString()
             };
-            localStorage.setItem('renovationData', JSON.stringify(data));
-            showStatus('Data saved successfully!', 'success');
+            localStorage.setItem('cheryls_renovationData', JSON.stringify(data));
+            showStatus('✅ Data saved successfully!', 'success');
         }
 
-        // Render the table
+        // Render the table with phase subtotals
         function renderTable() {
             const tbody = document.getElementById('taskTable');
             tbody.innerHTML = '';
             
-            let totalDays = 0;
-            let totalHours = 0;
-            let totalLabor = 0;
-            let totalMaterials = 0;
+            let grandTotalDays = 0;
+            let grandTotalHours = 0;
+            let grandTotalLabor = 0;
+            let grandTotalMaterials = 0;
+            
+            let currentPhase = '';
+            let phaseDays = 0;
+            let phaseHours = 0;
+            let phaseLabor = 0;
+            let phaseMaterials = 0;
             
             tasks.forEach((task, index) => {
+                // Check if we're starting a new phase
+                if (task.phase !== currentPhase) {
+                    // Add subtotal for previous phase if exists
+                    if (currentPhase !== '') {
+                        const subtotalRow = tbody.insertRow();
+                        subtotalRow.className = 'phase-subtotal';
+                        subtotalRow.innerHTML = `
+                            <td colspan="2">${currentPhase} Subtotal</td>
+                            <td>${phaseDays}</td>
+                            <td>-</td>
+                            <td class="hide-mobile">${phaseHours}</td>
+                            <td>$${phaseLabor.toLocaleString()}</td>
+                            <td>$${phaseMaterials.toLocaleString()}</td>
+                            <td>$${(phaseLabor + phaseMaterials).toLocaleString()}</td>
+                            <td colspan="2">-</td>
+                        `;
+                    }
+                    
+                    // Reset phase totals
+                    currentPhase = task.phase;
+                    phaseDays = 0;
+                    phaseHours = 0;
+                    phaseLabor = 0;
+                    phaseMaterials = 0;
+                    
+                    // Add phase header
+                    const headerRow = tbody.insertRow();
+                    headerRow.className = 'phase-header';
+                    headerRow.innerHTML = `<td colspan="10">${task.phase}</td>`;
+                }
+                
+                // Calculate task values
                 const hours = task.days * task.workers * 8;
                 const labor = hours * HOURLY_RATE;
                 const total = labor + task.materials;
                 
-                totalDays += task.days;
-                totalHours += hours;
-                totalLabor += labor;
-                totalMaterials += task.materials;
+                // Add to phase totals
+                phaseDays += task.days;
+                phaseHours += hours;
+                phaseLabor += labor;
+                phaseMaterials += task.materials;
                 
+                // Add to grand totals
+                grandTotalDays += task.days;
+                grandTotalHours += hours;
+                grandTotalLabor += labor;
+                grandTotalMaterials += task.materials;
+                
+                // Add task row
                 const row = tbody.insertRow();
+                const statusClass = `status-${task.status.toLowerCase().replace(' ', '-')}`;
                 row.innerHTML = `
-                    <td>${task.phase}</td>
+                    <td></td>
                     <td>${task.task}</td>
-                    <td><input type="number" value="${task.days}" onchange="updateTask(${index}, 'days', this.value)"></td>
-                    <td><input type="number" value="${task.workers}" onchange="updateTask(${index}, 'workers', this.value)"></td>
-                    <td>${hours}</td>
+                    <td><input type="number" value="${task.days}" onchange="updateTask(${index}, 'days', this.value)" min="0"></td>
+                    <td><input type="number" value="${task.workers}" onchange="updateTask(${index}, 'workers', this.value)" min="0"></td>
+                    <td class="hide-mobile">${hours}</td>
                     <td>$${labor.toLocaleString()}</td>
-                    <td><input type="number" value="${task.materials}" onchange="updateTask(${index}, 'materials', this.value)"></td>
+                    <td><input type="number" value="${task.materials}" onchange="updateTask(${index}, 'materials', this.value)" min="0"></td>
                     <td>$${total.toLocaleString()}</td>
                     <td>
-                        <select onchange="updateTask(${index}, 'status', this.value)" class="status-${task.status.toLowerCase()}">
+                        <select onchange="updateTask(${index}, 'status', this.value)" class="${statusClass}">
                             <option ${task.status === 'Pending' ? 'selected' : ''}>Pending</option>
                             <option ${task.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
                             <option ${task.status === 'Completed' ? 'selected' : ''}>Completed</option>
                         </select>
                     </td>
-                    <td><input type="text" value="${task.contractor}" onchange="updateTask(${index}, 'contractor', this.value)" placeholder="Contractor"></td>
+                    <td class="hide-mobile"><input type="text" value="${task.contractor}" onchange="updateTask(${index}, 'contractor', this.value)" placeholder="Contractor"></td>
                 `;
             });
             
-            // Update totals
-            document.getElementById('totalDays').textContent = totalDays;
-            document.getElementById('totalHours').textContent = totalHours;
-            document.getElementById('totalLabor').textContent = '$' + totalLabor.toLocaleString();
-            document.getElementById('totalMaterials').textContent = '$' + totalMaterials.toLocaleString();
-            document.getElementById('totalCost').textContent = '$' + (totalLabor + totalMaterials).toLocaleString();
+            // Add final phase subtotal
+            if (currentPhase !== '') {
+                const subtotalRow = tbody.insertRow();
+                subtotalRow.className = 'phase-subtotal';
+                subtotalRow.innerHTML = `
+                    <td colspan="2">${currentPhase} Subtotal</td>
+                    <td>${phaseDays}</td>
+                    <td>-</td>
+                    <td class="hide-mobile">${phaseHours}</td>
+                    <td>$${phaseLabor.toLocaleString()}</td>
+                    <td>$${phaseMaterials.toLocaleString()}</td>
+                    <td>$${(phaseLabor + phaseMaterials).toLocaleString()}</td>
+                    <td colspan="2">-</td>
+                `;
+            }
+            
+            // Update grand totals
+            document.getElementById('totalDays').textContent = grandTotalDays;
+            document.getElementById('totalHours').textContent = grandTotalHours;
+            document.getElementById('totalLabor').textContent = '$' + grandTotalLabor.toLocaleString();
+            document.getElementById('totalMaterials').textContent = '$' + grandTotalMaterials.toLocaleString();
+            document.getElementById('totalCost').textContent = '$' + (grandTotalLabor + grandTotalMaterials).toLocaleString();
         }
 
         // Update a task
         function updateTask(index, field, value) {
-            tasks[index][field] = field === 'days' || field === 'workers' || field === 'materials' 
-                ? parseInt(value) || 0 
-                : value;
+            if (field === 'days' || field === 'workers' || field === 'materials') {
+                tasks[index][field] = Math.max(0, parseInt(value) || 0);
+            } else {
+                tasks[index][field] = value;
+            }
             renderTable();
             saveData();
         }
@@ -289,9 +523,9 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'renovation-data-' + new Date().toISOString().split('T')[0] + '.json';
+            a.download = 'cheryls-renovation-' + new Date().toISOString().split('T')[0] + '.json';
             a.click();
-            showStatus('Data exported!', 'success');
+            showStatus('📥 Data exported successfully!', 'success');
         }
 
         // Import data
@@ -309,9 +543,9 @@
                         document.getElementById('notes').value = data.notes || '';
                         renderTable();
                         saveData();
-                        showStatus('Data imported successfully!', 'success');
+                        showStatus('📤 Data imported successfully!', 'success');
                     } catch (err) {
-                        showStatus('Error importing file!', 'error');
+                        showStatus('❌ Error importing file!', 'error');
                     }
                 };
                 reader.readAsText(file);
@@ -321,12 +555,12 @@
 
         // Reset data
         function resetData() {
-            if (confirm('Are you sure you want to reset all data?')) {
-                localStorage.removeItem('renovationData');
-                tasks = defaultTasks;
+            if (confirm('Are you sure you want to reset all data to defaults?')) {
+                localStorage.removeItem('cheryls_renovationData');
+                tasks = [...defaultTasks];
                 document.getElementById('notes').value = '';
                 renderTable();
-                showStatus('Data reset to defaults', 'success');
+                showStatus('🔄 Data reset to defaults', 'success');
             }
         }
 
@@ -335,16 +569,19 @@
             const status = document.getElementById('status');
             status.textContent = message;
             status.className = type;
+            status.style.display = 'block';
             setTimeout(() => {
                 status.style.display = 'none';
             }, 3000);
         }
 
         // Auto-save on notes change
-        document.getElementById('notes').addEventListener('change', saveData);
+        document.getElementById('notes').addEventListener('input', function() {
+            saveData();
+        });
 
         // Load on startup
-        loadData();
+        window.addEventListener('DOMContentLoaded', loadData);
     </script>
 </body>
 </html>
