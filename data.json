@@ -1,14 +1,30 @@
 {
-  "lastUpdated": "2025-01-14T10:30:00Z",
+  "hourlyRate": 55,
+  "defaultWorkers": 2,
+  "lastUpdated": "",
+  "lastUpdatedBy": "",
+  "projectNotes": "Enter your project notes here...",
   "tasks": [
     {
       "taskName": "Remove cabinets",
       "duration": "2",
-      "workers": "2", 
+      "workers": "2",
       "materials": "100",
       "status": "Pending"
     },
-    // ... more tasks
-  ],
-  "projectNotes": "Your notes here..."
+    {
+      "taskName": "Wall modifications",
+      "duration": "3",
+      "workers": "2",
+      "materials": "800",
+      "status": "Pending"
+    },
+    {
+      "taskName": "Rough-in wiring",
+      "duration": "2",
+      "workers": "2",
+      "materials": "600",
+      "status": "Pending"
+    }
+  ]
 }
